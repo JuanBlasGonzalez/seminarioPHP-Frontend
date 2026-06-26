@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom';
+
 function NavBarComponent() {
   return (
     <nav>
-      <a href="/">Cotizaciones</a>
-      <a href="/registro">Registro de usuario</a>
-      <a href="/login">Login</a>
+      <Link to="/">Cotizaciones</Link>
+      <Link to="/registro">Registro de usuario</Link>
+      <Link to="/login">Login</Link>
     </nav>
   );
 }
