@@ -1,9 +1,22 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('wally_token');
+    const storedUser = localStorage.getItem('wally_user');
+    if (token && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem('wally_user');
+      }
+    }
+  }, []);
 
   const login = (token, userData) => {
     localStorage.setItem('wally_token', token);
@@ -11,7 +24,12 @@ export function AuthProvider({ children }) {
     setUser(userData);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.post('/logout');
+    } catch (err) {
+      console.error('Error al cerrar sesion:', err);
+    }
     localStorage.removeItem('wally_token');
     localStorage.removeItem('wally_user');
     setUser(null);
@@ -21,7 +39,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
-  );    
+  );
 }
 
 export function useAuth() {
