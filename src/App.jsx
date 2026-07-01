@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute/ProtectedRoute';
 import HeaderComponent from './components/HeaderComponent/HeaderComponent';
 import FooterComponent from './components/FooterComponent/FooterComponent';
 import NavBarComponent from './components/NavBarComponent/NavBarComponent';
@@ -22,11 +23,27 @@ function App() {
           <Route path="/" element={<StatPage />} />
           <Route path="/registro" element={<RegistroPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/editar-usuario" element={<EditarUsuarioPage />} />
-          <Route path="/portfolio" element={<PortfolioPage />} />
-          <Route path="/operaciones" element={<OperacionesPage />} />
           <Route path="/panel" element={<PanelPage />} />
-          <Route path="/usuarios" element={<UsuariosPage />} />
+          <Route path="/portfolio" element={
+            <ProtectedRoute>
+              <PortfolioPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/operaciones" element={
+            <ProtectedRoute>
+              <OperacionesPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/editar-usuario" element={
+            <ProtectedRoute>
+              <EditarUsuarioPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/usuarios" element={
+            <AdminRoute>
+              <UsuariosPage />
+            </AdminRoute>
+          } />
         </Routes>
         <FooterComponent />
       </AuthProvider>

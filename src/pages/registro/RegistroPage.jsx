@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -9,6 +10,7 @@ function RegistroPage() {
   const [errors, setErrors] = useState({ email: '', name: '', password: '' });
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -48,7 +50,7 @@ function RegistroPage() {
     setSubmitting(true);
     try {
       await api.post('/users', form);
-      alert('Usuario registrado correctamente.');
+      navigate('/login');
     } catch (err) {
       setServerError(err.response?.data?.error || 'No se pudo completar el registro.');
     } finally {
