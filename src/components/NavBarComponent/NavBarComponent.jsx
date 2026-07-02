@@ -31,7 +31,7 @@ function NavBarComponent() {
         <Link to="/operaciones" className="navbar__link">Mis operaciones</Link>
         <Link to="/panel" className="navbar__link">Ver Panel</Link>
         <Link to="/editar-usuario" className="navbar__link">Editar usuario</Link>
-        {user.isAdmin && (
+        {!!user.isAdmin && (
           <Link to="/usuarios" className="navbar__link">Manejo usuarios</Link>
         )}
         <button onClick={handleLogout} className="navbar__link navbar__link--logout">

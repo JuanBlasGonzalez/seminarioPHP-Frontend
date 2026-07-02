@@ -1,6 +1,6 @@
 # WALLy Street — Frontend (React + Vite)
 
-Segunda entrega del Seminario de Lenguajes — Opción PHP, React y API Rest — UNLP 2026.
+Segunda entrega Seminario de Lenguajes — Opción PHP, React y API Rest — UNLP 2026.
 
 Consume la API REST construida con Slim (primera entrega).
 

@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const logoutRef = useRef(null);
 
   const logout = async (callApi = true) => {
@@ -34,6 +35,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('wally_user');
       }
     }
+    setLoading(false);
   }, []);
 
   const login = (token, userData) => {
@@ -51,7 +53,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

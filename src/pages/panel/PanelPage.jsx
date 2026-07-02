@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
@@ -6,7 +6,7 @@ import { REFRESH_INTERVAL_MS } from '../../utils/constants';
 import './PanelPage.css';
 
 function PanelPage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const [assets, setAssets] = useState([]);
@@ -22,6 +22,15 @@ function PanelPage() {
   const [historyTarget, setHistoryTarget] = useState(null);
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  const fetchBalance = useCallback(async () => {
+    try {
+      const response = await api.get(`/users/${user.id}`);
+      updateUser({ balance: response.data.balance });
+    } catch (err) {
+      console.error(err);
+    } 
+  }, [user?.id]);
 
   const fetchAssets = async () => {
     try {
@@ -79,6 +88,7 @@ function PanelPage() {
       await api.post('/trade/buy', { asset_id: buyTarget.id, quantity });
       setBuyTarget(null);
       fetchAssets();
+      await fetchBalance();
     } catch (err) {
       setBuyError(err.response?.data?.error || 'No se pudo completar la compra.');
     } finally {
