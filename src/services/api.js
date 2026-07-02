@@ -15,4 +15,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+export const setupInterceptors = (logout) => {
+  api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('wally_token');
+        localStorage.removeItem('wally_user');
+        logout(false);
+      }
+      return Promise.reject(error);
+    }
+  );
+};
+
 export default api;

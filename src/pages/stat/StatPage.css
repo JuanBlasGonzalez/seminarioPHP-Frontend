@@ -1,0 +1,51 @@
+.stat-page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.stat-page__subtitle {
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.stat-page__search {
+  margin-bottom: 1rem;
+  max-width: 300px;
+}
+
+.stat-page__table {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.stat-page__sortable {
+  cursor: pointer;
+  user-select: none;
+  color: var(--color-text-muted);
+}
+
+.stat-page__sortable:hover {
+  color: var(--color-text);
+}
+
+.stat-page__price {
+  font-family: var(--font-mono);
+}
+
+.stat-page__evolution--up {
+  color: var(--color-gain);
+  font-weight: 700;
+}
+
+.stat-page__evolution--down {
+  color: var(--color-loss);
+  font-weight: 700;
+}
+
+.stat-page__evolution--neutral {
+  color: var(--color-text-muted);
+}

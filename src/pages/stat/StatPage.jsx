@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
+import './StatPage.css';
 
 function StatPage() {
   const [assets, setAssets] = useState([]);
@@ -67,26 +68,30 @@ function StatPage() {
   };
 
   if (loading) return <p>Cargando activos...</p>;
-  if (error) return <p>{error}</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
-    <main>
+    <div className="stat-page">
       <h2>Cotizaciones del mercado</h2>
+      <p className="stat-page__subtitle">
+        Precios actualizados automáticamente cada 3 minutos.
+      </p>
 
       <input
         type="text"
         placeholder="Buscar por nombre..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        className="stat-page__search"
       />
 
-      <table>
+      <table className="stat-page__table">
         <thead>
           <tr>
-            <th onClick={() => toggleSort('name')} style={{ cursor: 'pointer' }}>
+            <th onClick={() => toggleSort('name')} className="stat-page__sortable">
               Nombre {sortBy === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
             </th>
-            <th onClick={() => toggleSort('price')} style={{ cursor: 'pointer' }}>
+            <th onClick={() => toggleSort('price')} className="stat-page__sortable">
               Precio {sortBy === 'price' && (sortDir === 'asc' ? '↑' : '↓')}
             </th>
             <th>Evolución</th>
@@ -96,8 +101,10 @@ function StatPage() {
           {filtered.map((asset) => (
             <tr key={asset.id}>
               <td>{asset.name}</td>
-              <td>${Number(asset.current_price).toFixed(2)}</td>
-              <td>
+              <td className="stat-page__price">
+                ${Number(asset.current_price).toFixed(2)}
+              </td>
+              <td className={`stat-page__evolution--${asset.evolution}`}>
                 {asset.evolution === 'up' && '▲'}
                 {asset.evolution === 'down' && '▼'}
                 {asset.evolution === 'neutral' && '—'}
@@ -106,7 +113,7 @@ function StatPage() {
           ))}
         </tbody>
       </table>
-    </main>
+    </div>
   );
 }
 

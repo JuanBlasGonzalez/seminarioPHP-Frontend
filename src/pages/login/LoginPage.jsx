@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import './LoginPage.css';
 
 function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -30,7 +30,8 @@ function LoginPage() {
       login(response.data.token, {
         id: response.data.id,
         name: response.data.name,
-        isAdmin: response.data.is_admin
+        isAdmin: response.data.is_admin,
+        balance: response.data.balance
       });
       navigate('/');
     } catch (err) {
@@ -41,22 +42,26 @@ function LoginPage() {
   };
 
   return (
-    <main>
+    <div className="login-page">
       <h2>Iniciar sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Email</label>
+      <form onSubmit={handleSubmit} className="login-page__form" noValidate>
+        <label className="login-page__label">Email</label>
         <input type="email" name="email" value={form.email} onChange={handleChange} />
 
-        <label>Contraseña</label>
+        <label className="login-page__label">Contraseña</label>
         <input type="password" name="password" value={form.password} onChange={handleChange} />
 
-        {error && <p>{error}</p>}
+        {error && <p className="login-page__error">{error}</p>}
 
-        <button type="submit" disabled={submitting}>
+        <button type="submit" disabled={submitting} className="btn">
           {submitting ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>
-    </main>
+
+      <p className="login-page__footer-link">
+        ¿No tenés cuenta? <Link to="/registro">Registrate</Link>
+      </p>
+    </div>
   );
 }
 

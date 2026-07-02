@@ -1,0 +1,20 @@
+:root {
+  --color-bg: #0A0E1A;
+  --color-surface: #141A2B;
+  --color-surface-light: #1C2438;
+  --color-border: #262F47;
+
+  --color-text: #E8EAEE;
+  --color-text-muted: #7C8798;
+
+  --color-gain: #00D9A3;
+  --color-loss: #FF5470;
+  --color-brand: #FFB627;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius: 10px;
+  --max-width: 1200px;
+}

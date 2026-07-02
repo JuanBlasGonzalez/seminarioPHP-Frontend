@@ -1,0 +1,51 @@
+.usuarios-page {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.usuarios-page__actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.usuarios-page__search {
+  max-width: 300px;
+}
+
+.usuarios-page__table {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.usuarios-page__top-row td {
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.usuarios-page__edit-link {
+  color: var(--color-brand);
+  font-size: 0.85rem;
+}
+
+.usuarios-page__edit-link:hover {
+  text-decoration: underline;
+}
+
+.usuarios-page__pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.usuarios-page__pagination span {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

@@ -12,6 +12,8 @@ import PortfolioPage from './pages/portfolio/PortfolioPage';
 import OperacionesPage from './pages/operaciones/OperacionesPage';
 import PanelPage from './pages/panel/PanelPage';
 import UsuariosPage from './pages/usuarios/UsuariosPage';
+import './assets/styles/variables.css';
+import './assets/styles/global.css';
 
 function App() {
   return (
@@ -42,6 +44,16 @@ function App() {
           <Route path="/usuarios" element={
             <AdminRoute>
               <UsuariosPage />
+            </AdminRoute>
+          } />
+          <Route path="/editar-usuario/:id" element={
+            <AdminRoute>
+              <EditarUsuarioPage />
+            </AdminRoute>
+          } />
+          <Route path="/editar-usuario/:id" element={
+            <AdminRoute>
+              <EditarUsuarioPage />
             </AdminRoute>
           } />
         </Routes>

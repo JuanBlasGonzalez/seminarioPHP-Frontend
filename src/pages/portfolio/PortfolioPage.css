@@ -1,0 +1,86 @@
+.portfolio-page {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.portfolio-page__balance {
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.portfolio-page__balance span {
+  font-family: var(--font-mono);
+  color: var(--color-gain);
+  font-weight: 600;
+}
+
+.portfolio-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.portfolio-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.portfolio-card__quantity {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.portfolio-card__value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.portfolio-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.portfolio-card__action-panel {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.portfolio-card__quantity-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.portfolio-card__estimate {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.portfolio-card__action-error {
+  color: var(--color-loss);
+  font-size: 0.85rem;
+}
+
+.portfolio-card__action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.portfolio-page__panel-link {
+  color: var(--color-brand);
+  font-weight: 600;
+}

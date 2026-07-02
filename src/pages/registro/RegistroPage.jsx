@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
+import './RegistroPage.css';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,7 +25,6 @@ function RegistroPage() {
       newErrors.email = 'Ingresá un email válido.';
       isValid = false;
     }
-
     if (!form.name.trim()) {
       newErrors.name = 'El nombre no puede estar vacío.';
       isValid = false;
@@ -32,7 +32,6 @@ function RegistroPage() {
       newErrors.name = 'El nombre no puede superar los 30 caracteres.';
       isValid = false;
     }
-
     if (!PASSWORD_REGEX.test(form.password)) {
       newErrors.password = 'La contraseña debe tener 8+ caracteres, mayúscula, minúscula, número y carácter especial.';
       isValid = false;
@@ -59,28 +58,32 @@ function RegistroPage() {
   };
 
   return (
-    <main>
+    <div className="registro-page">
       <h2>Registro de usuario</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Email</label>
+      <form onSubmit={handleSubmit} className="registro-page__form" noValidate>
+        <label className="registro-page__label">Email</label>
         <input type="email" name="email" value={form.email} onChange={handleChange} />
-        <p>{errors.email}</p>
+        <p className="registro-page__error">{errors.email}</p>
 
-        <label>Nombre</label>
+        <label className="registro-page__label">Nombre</label>
         <input type="text" name="name" value={form.name} onChange={handleChange} />
-        <p>{errors.name}</p>
+        <p className="registro-page__error">{errors.name}</p>
 
-        <label>Contraseña</label>
+        <label className="registro-page__label">Contraseña</label>
         <input type="password" name="password" value={form.password} onChange={handleChange} />
-        <p>{errors.password}</p>
+        <p className="registro-page__error">{errors.password}</p>
 
-        {serverError && <p>{serverError}</p>}
+        {serverError && <p className="registro-page__server-error">{serverError}</p>}
 
-        <button type="submit" disabled={submitting}>
+        <button type="submit" disabled={submitting} className="btn">
           {submitting ? 'Registrando...' : 'Registrarme'}
         </button>
       </form>
-    </main>
+
+      <p className="registro-page__footer-link">
+        ¿Ya tenés cuenta? <Link to="/login">Iniciar sesión</Link>
+      </p>
+    </div>
   );
 }
 

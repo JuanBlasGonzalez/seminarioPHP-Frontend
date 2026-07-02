@@ -1,8 +1,16 @@
+import './FooterComponent.css';
+
+const TEAM_MEMBERS = ['Juan Blas Gonzalez Seijas', 'Valentin Lumbreras'];
+
 function FooterComponent() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer>
-      <p>Juan Blas Gonzalez Seijas - Valentin Lumbreras</p>
-      <p>WALLy Street 2026</p>
+    <footer className="footer">
+      <div className="footer__container">
+        <p>{TEAM_MEMBERS.join(' · ')}</p>
+        <p>WALLy Street © {currentYear}</p>
+      </div>
     </footer>
   );
 }
