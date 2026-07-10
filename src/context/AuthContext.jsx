@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
-import api, { setupInterceptors } from '../services/api';
+import api, { setupInterceptors } from '../config/api';
+import { logoutService } from '../services/auth.services';
+
 
 const AuthContext = createContext(null);
 
@@ -11,7 +13,7 @@ export function AuthProvider({ children }) {
   const logout = async (callApi = true) => {
     if (callApi) {
       try {
-        await api.post('/logout');
+        await logoutService();
       } catch (err) {
         console.error('Error al cerrar sesion:', err);
       }

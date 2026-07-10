@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import api from '../../services/api';
+import {getAssetsService} from '../../services/asset.services';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
 import './StatPage.css';
 
@@ -14,7 +14,7 @@ function StatPage() {
 
   const fetchAssets = async () => {
     try {
-      const response = await api.get('/assets');
+      const response = await getAssetsService();
       const data = response.data;
 
       const withEvolution = data.map((asset) => {

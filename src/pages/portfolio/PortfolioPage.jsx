@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { getPortfolioService, buyAssetService, sellAssetService, deletePortfolioAssetService } from '../../services/portfolio.services';
+import { getUserService } from '../../services/user.services';
 import './PortfolioPage.css';
 
 function PortfolioPage() {
@@ -16,7 +17,7 @@ function PortfolioPage() {
 
   const fetchPortfolio = useCallback(async () => {
     try {
-      const response = await api.get('/portfolio');
+      const response = await getPortfolioService();
       setHoldings(response.data);
       setError('');
     } catch (err) {
@@ -28,7 +29,7 @@ function PortfolioPage() {
 
   const fetchBalance = useCallback(async () => {
     try {
-      const response = await api.get(`/users/${user.id}`);
+      const response = await getUserService(user.id);
       updateUser({ balance: response.data.balance });
     } catch (err) {
       console.error(err);
@@ -62,8 +63,7 @@ function PortfolioPage() {
 
     setActionLoading(true);
     try {
-      const endpoint = activeAction.type === 'buy' ? '/trade/buy' : '/trade/sell';
-      await api.post(endpoint, { asset_id: holding.asset_id, quantity });
+      activeAction.type === 'buy' ? await buyAssetService(holding.asset_id, quantity) : await sellAssetService(holding.asset_id, quantity);
       await fetchPortfolio();
       await fetchBalance();
       closeAction();
@@ -76,7 +76,7 @@ function PortfolioPage() {
 
   const handleDelete = async (assetId) => {
     try {
-      await api.delete(`/portfolio/${assetId}`);
+      await deletePortfolioAssetService(assetId);
       await fetchPortfolio();
     } catch (err) {
       alert(err.response?.data?.error || 'No se pudo eliminar el activo.');

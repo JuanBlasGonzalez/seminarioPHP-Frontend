@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { loginService } from '../../services/auth.services';
 import './LoginPage.css';
 
 function LoginPage() {
@@ -26,7 +26,7 @@ function LoginPage() {
 
     setSubmitting(true);
     try {
-      const response = await api.post('/login', form);
+      const response = await loginService(form);
       login(response.data.token, {
         id: response.data.id,
         name: response.data.name,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../../services/api';
+import {getAllUsersService} from '../../services/user.services';
+import { updateAssetsPricesService } from '../../services/asset.services';
 import './UsuariosPage.css';
 
 const PAGE_SIZE = 5;
@@ -14,7 +15,7 @@ function UsuariosPage() {
   const [updatingPrices, setUpdatingPrices] = useState(false);
 
   useEffect(() => {
-    api.get('/users')
+    getAllUsersService()
       .then((res) => setUsers(res.data))
       .catch(() => setError('No se pudo cargar el listado.'))
       .finally(() => setLoading(false));
@@ -23,7 +24,7 @@ function UsuariosPage() {
   const handleUpdatePrices = async () => {
     setUpdatingPrices(true);
     try {
-      await api.put('/assets');
+      await updateAssetsPricesService();
       alert('Precios actualizados correctamente.');
     } catch (err) {
       alert(err.response?.data?.error || 'No se pudieron actualizar los precios.');

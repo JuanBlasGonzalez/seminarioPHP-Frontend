@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import api from '../../services/api';
+import {getTransactionsService} from '../../services/transaction.services';
+import {getAssetsService} from '../../services/asset.services';
 import './OperacionesPage.css';
 
 function OperacionesPage() {
@@ -10,7 +11,7 @@ function OperacionesPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.get('/assets')
+    getAssetsService()
       .then((res) => setAssets(res.data))
       .catch(() => {});
   }, []);
@@ -22,7 +23,7 @@ function OperacionesPage() {
       if (filters.type) params.type = filters.type;
       if (filters.asset_id) params.asset_id = filters.asset_id;
 
-      const response = await api.get('/transactions', { params });
+      const response = await getTransactionsService({ params });
       setTransactions(response.data);
       setError('');
     } catch (err) {

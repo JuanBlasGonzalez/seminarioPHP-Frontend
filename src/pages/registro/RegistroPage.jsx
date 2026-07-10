@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../../services/api';
+import {registroService} from '../../services/auth.services';
 import './RegistroPage.css';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -48,7 +48,7 @@ function RegistroPage() {
 
     setSubmitting(true);
     try {
-      await api.post('/users', form);
+      await registroService(form);
       navigate('/login');
     } catch (err) {
       setServerError(err.response?.data?.error || 'No se pudo completar el registro.');

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import {getAllUsersService, updateUserService, getUserService, deleteUserService} from '../../services/user.services';
 import './EditarUsuarioPage.css';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -25,7 +25,7 @@ function EditarUsuarioPage() {
     if (isEditingSelf && user) {
       setForm((prev) => ({ ...prev, name: user.name }));
     } else if (targetId) {
-      api.get(`/users/${targetId}`)
+      getUserService(targetId)
         .then((res) => setForm((prev) => ({ ...prev, name: res.data.name })))
         .catch(() => setServerError('No se pudo cargar el usuario.'))
         .finally(() => setLoadingUser(false));
@@ -74,7 +74,7 @@ function EditarUsuarioPage() {
 
     setSubmitting(true);
     try {
-      await api.put(`/users/${targetId}`, payload);
+      await updateUserService(targetId, payload);
       setSuccess('Datos actualizados correctamente.');
       if (isEditingSelf) {
         updateUser({ name: form.name });

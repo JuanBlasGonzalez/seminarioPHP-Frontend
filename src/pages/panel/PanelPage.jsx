@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import {getUserService} from '../../services/user.services';
+import {getAssetsService,getAssetHistoryService} from '../../services/asset.services';
+import {buyAssetService} from '../../services/portfolio.services';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
 import './PanelPage.css';
 
@@ -25,16 +27,16 @@ function PanelPage() {
 
   const fetchBalance = useCallback(async () => {
     try {
-      const response = await api.get(`/users/${user.id}`);
+      const response = await getUserService(user.id);
       updateUser({ balance: response.data.balance });
     } catch (err) {
       console.error(err);
     } 
   }, [user?.id]);
-
+  
   const fetchAssets = async () => {
     try {
-      const response = await api.get('/assets');
+      const response = await getAssetsService();
       const data = response.data;
 
       const withEvolution = data.map((asset) => {
@@ -85,7 +87,7 @@ function PanelPage() {
     }
     setBuyLoading(true);
     try {
-      await api.post('/trade/buy', { asset_id: buyTarget.id, quantity });
+      await buyAssetService(buyTarget.id, quantity);
       setBuyTarget(null);
       fetchAssets();
       await fetchBalance();
@@ -100,7 +102,7 @@ function PanelPage() {
     setHistoryTarget(asset);
     setHistoryLoading(true);
     try {
-      const response = await api.get(`/assets/${asset.id}/history/5`);
+      const response = await getAssetHistoryService(asset.id, 5);
       const prices = response.data.map((m) => Number(m.price_per_unit)).reverse();
       setHistoryData(prices);
     } catch {
