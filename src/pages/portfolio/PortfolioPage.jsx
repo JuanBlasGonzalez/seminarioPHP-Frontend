@@ -14,6 +14,8 @@ function PortfolioPage() {
   const [quantity, setQuantity] = useState(1);
   const [actionError, setActionError] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const fetchPortfolio = useCallback(async () => {
     try {
@@ -66,6 +68,11 @@ function PortfolioPage() {
       activeAction.type === 'buy' ? await buyAssetService(holding.asset_id, quantity) : await sellAssetService(holding.asset_id, quantity);
       await fetchPortfolio();
       await fetchBalance();
+      setSuccessMessage(
+        activeAction.type === 'buy'
+          ? `Compraste ${quantity} unidades de ${holding.name} correctamente.`
+          : `Vendiste ${quantity} unidades de ${holding.name} correctamente.`
+      );
       closeAction();
     } catch (err) {
       setActionError(err.response?.data?.error || 'No se pudo completar la operación.');
@@ -78,8 +85,10 @@ function PortfolioPage() {
     try {
       await deletePortfolioAssetService(assetId);
       await fetchPortfolio();
+      setDeleteTarget(null);
     } catch (err) {
       alert(err.response?.data?.error || 'No se pudo eliminar el activo.');
+      setDeleteTarget(null);
     }
   };
 
@@ -95,6 +104,10 @@ function PortfolioPage() {
 
       {holdings.length === 0 && <p>Todavía no tenés activos en tu portfolio.</p>}
 
+      {successMessage && (
+        <p className="portfolio-page__success">{successMessage}</p>
+      )}
+      
       <div className="portfolio-page__grid">
         {holdings.map((holding) => {
           const currentValue = Number(holding.quantity) * Number(holding.current_price);
@@ -118,11 +131,11 @@ function PortfolioPage() {
                   Vender
                 </button>
                 <button
-                  onClick={() => handleDelete(holding.asset_id)}
+                  onClick={() => setDeleteTarget(holding.asset_id)}
                   disabled={Number(holding.quantity) !== 0}
                   className="btn btn-danger"
                 >
-                  Eliminar
+                  Eliminar  
                 </button>
               </div>
 
@@ -161,6 +174,23 @@ function PortfolioPage() {
           );
         })}
       </div>
+
+      {deleteTarget && (
+        <div className="portfolio-page__modal-overlay">
+          <div className="portfolio-page__modal">
+            <h3>¿Confirmás la eliminación?</h3>
+            <p>Esta acción eliminará el activo de tu portfolio.</p>
+            <div className="portfolio-page__modal-buttons">
+              <button onClick={() => handleDelete(deleteTarget)} className="btn btn-danger">
+                Confirmar
+              </button>
+              <button onClick={() => setDeleteTarget(null)} className="btn btn-secondary">
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Link to="/panel" className="portfolio-page__panel-link">
         Ir al Panel →

@@ -24,7 +24,7 @@ function PanelPage() {
   const [historyTarget, setHistoryTarget] = useState(null);
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
-
+  const [successMessage, setSuccessMessage] = useState('');
   const fetchBalance = useCallback(async () => {
     try {
       const response = await getUserService(user.id);
@@ -88,6 +88,7 @@ function PanelPage() {
     setBuyLoading(true);
     try {
       await buyAssetService(buyTarget.id, quantity);
+      setSuccessMessage(`Compraste ${quantity} unidades de ${buyTarget.name} correctamente.`);
       setBuyTarget(null);
       fetchAssets();
       await fetchBalance();
@@ -193,6 +194,10 @@ function PanelPage() {
           ))}
         </tbody>
       </table>
+
+      {successMessage && (
+        <p className="panel-page__success">{successMessage}</p>
+      )}
 
       {buyTarget && (
         <div className="panel-page__modal">

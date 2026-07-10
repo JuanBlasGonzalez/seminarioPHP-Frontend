@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {getAllUsersService, updateUserService, getUserService, deleteUserService} from '../../services/user.services';
+import { validateName, validatePassword, validatePasswordMatch } from '../../utils/validations';
 import './EditarUsuarioPage.css';
-
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
 function EditarUsuarioPage() {
   const { id } = useParams();
@@ -38,30 +37,14 @@ function EditarUsuarioPage() {
 
   const validate = () => {
     const newErrors = { name: '', password: '', repeatPassword: '' };
-    let isValid = true;
-
-    if (!form.name.trim()) {
-      newErrors.name = 'El nombre no puede estar vacío.';
-      isValid = false;
-    } else if (form.name.length > 30) {
-      newErrors.name = 'Máximo 30 caracteres.';
-      isValid = false;
-    }
-
+    newErrors.name = validateName(form.name);
     if (form.password || form.repeatPassword) {
-      if (!PASSWORD_REGEX.test(form.password)) {
-        newErrors.password = 'Debe tener 8+ caracteres, mayúscula, minúscula, número y carácter especial.';
-        isValid = false;
-      }
-      if (form.password !== form.repeatPassword) {
-        newErrors.repeatPassword = 'Las contraseñas no coinciden.';
-        isValid = false;
-      }
+      newErrors.password = validatePassword(form.password);
+      newErrors.repeatPassword = validatePasswordMatch(form.password, form.repeatPassword);
     }
-
     setErrors(newErrors);
-    return isValid;
-  };
+    return !Object.values(newErrors).some((e) => e !== '');
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

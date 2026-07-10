@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {registroService} from '../../services/auth.services';
-import './RegistroPage.css';
-
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { validateEmail, validateName, validatePassword } from '../../utils/validations';
+import './RegistroPage.css';  
 
 function RegistroPage() {
   const [form, setForm] = useState({ email: '', name: '', password: '' });
@@ -18,27 +16,13 @@ function RegistroPage() {
   };
 
   const validate = () => {
-    const newErrors = { email: '', name: '', password: '' };
-    let isValid = true;
-
-    if (!EMAIL_REGEX.test(form.email)) {
-      newErrors.email = 'Ingresá un email válido.';
-      isValid = false;
-    }
-    if (!form.name.trim()) {
-      newErrors.name = 'El nombre no puede estar vacío.';
-      isValid = false;
-    } else if (form.name.length > 30) {
-      newErrors.name = 'El nombre no puede superar los 30 caracteres.';
-      isValid = false;
-    }
-    if (!PASSWORD_REGEX.test(form.password)) {
-      newErrors.password = 'La contraseña debe tener 8+ caracteres, mayúscula, minúscula, número y carácter especial.';
-      isValid = false;
-    }
-
+    const newErrors = {
+      email: validateEmail(form.email),
+      name: validateName(form.name),
+      password: validatePassword(form.password)
+    };
     setErrors(newErrors);
-    return isValid;
+    return !Object.values(newErrors).some((e) => e !== '');
   };
 
   const handleSubmit = async (e) => {

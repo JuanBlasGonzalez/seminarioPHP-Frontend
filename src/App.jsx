@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute/ProtectedRoute';
+import { ProtectedRoute, AdminRoute } from './router/ProtectedRoute';
 import HeaderComponent from './components/HeaderComponent/HeaderComponent';
 import FooterComponent from './components/FooterComponent/FooterComponent';
 import NavBarComponent from './components/NavBarComponent/NavBarComponent';

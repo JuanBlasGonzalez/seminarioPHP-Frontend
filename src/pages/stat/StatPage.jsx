@@ -12,9 +12,12 @@ function StatPage() {
   const [sortDir, setSortDir] = useState('asc');
   const previousPrices = useRef({});
 
-  const fetchAssets = async () => {
+  const fetchAssets = async (searchTerm = '') => {
     try {
-      const response = await getAssetsService();
+      const params = {};
+      if (searchTerm) params.type = searchTerm;
+
+      const response = await getAssetsService(params);
       const data = response.data;
 
       const withEvolution = data.map((asset) => {
@@ -43,20 +46,18 @@ function StatPage() {
   };
 
   useEffect(() => {
-    fetchAssets();
-    const interval = setInterval(fetchAssets, REFRESH_INTERVAL_MS);
+    fetchAssets(search);
+    const interval = setInterval(() => fetchAssets(search), REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, [search]);
 
-  const filtered = assets
-    .filter((a) => a.name.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => {
-      const valA = sortBy === 'price' ? Number(a.current_price) : a.name.toLowerCase();
-      const valB = sortBy === 'price' ? Number(b.current_price) : b.name.toLowerCase();
-      if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-      if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-      return 0;
-    });
+  const sorted = [...assets].sort((a, b) => {
+    const valA = sortBy === 'price' ? Number(a.current_price) : a.name.toLowerCase();
+    const valB = sortBy === 'price' ? Number(b.current_price) : b.name.toLowerCase();
+    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   const toggleSort = (field) => {
     if (sortBy === field) {
@@ -98,7 +99,7 @@ function StatPage() {
           </tr>
         </thead>
         <tbody>
-          {filtered.map((asset) => (
+          {sorted.map((asset) => (
             <tr key={asset.id}>
               <td>{asset.name}</td>
               <td className="stat-page__price">
