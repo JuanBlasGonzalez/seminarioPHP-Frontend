@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getPortfolioService, buyAssetService, sellAssetService, deletePortfolioAssetService } from '../../services/portfolio.services';
 import { getUserService } from '../../services/user.services';
+import Modal from '../../components/Modal/Modal';
 import './PortfolioPage.css';
 
 function PortfolioPage() {
@@ -176,20 +177,17 @@ function PortfolioPage() {
       </div>
 
       {deleteTarget && (
-        <div className="portfolio-page__modal-overlay">
-          <div className="portfolio-page__modal">
-            <h3>¿Confirmás la eliminación?</h3>
-            <p>Esta acción eliminará el activo de tu portfolio.</p>
-            <div className="portfolio-page__modal-buttons">
-              <button onClick={() => handleDelete(deleteTarget)} className="btn btn-danger">
-                Confirmar
-              </button>
-              <button onClick={() => setDeleteTarget(null)} className="btn btn-secondary">
-                Cancelar
-              </button>
-            </div>
+        <Modal title="¿Confirmás la eliminación?" onClose={() => setDeleteTarget(null)}>
+          <p>Esta acción eliminará el activo de tu portfolio.</p>
+          <div className="portfolio-page__modal-buttons">
+            <button onClick={() => handleDelete(deleteTarget)} className="btn btn-danger">
+              Confirmar
+            </button>
+            <button onClick={() => setDeleteTarget(null)} className="btn btn-secondary">
+              Cancelar
+            </button>
           </div>
-        </div>
+        </Modal>
       )}
 
       <Link to="/panel" className="portfolio-page__panel-link">

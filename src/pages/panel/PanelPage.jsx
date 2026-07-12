@@ -5,6 +5,7 @@ import {getUserService} from '../../services/user.services';
 import {getAssetsService,getAssetHistoryService} from '../../services/asset.services';
 import {buyAssetService} from '../../services/portfolio.services';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
+import Modal from '../../components/Modal/Modal';
 import './PanelPage.css';
 
 function PanelPage() {
@@ -200,46 +201,38 @@ function PanelPage() {
       )}
 
       {buyTarget && (
-        <div className="panel-page__modal">
-          <div className="panel-page__modal-content">
-            <h3 className="panel-page__modal-title">Comprar {buyTarget.name}</h3>
-            <p>Precio actual: ${Number(buyTarget.current_price).toFixed(2)}</p>
-            <label>Cantidad:</label>
-            <input
-              type="number"
-              min="1"
-              max="20"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-            />
-            <p className="panel-page__estimate">
-              Total estimado: ${(quantity * Number(buyTarget.current_price)).toFixed(2)}
-            </p>
-            {buyError && <p className="panel-page__modal-error">{buyError}</p>}
-            <div className="panel-page__modal-buttons">
-              <button onClick={confirmBuy} disabled={buyLoading} className="btn">
-                {buyLoading ? 'Comprando...' : 'Confirmar compra'}
-              </button>
-              <button onClick={() => setBuyTarget(null)} className="btn btn-secondary">
-                Cancelar
-              </button>
-            </div>
+        <Modal title={`Comprar ${buyTarget.name}`} onClose={() => setBuyTarget(null)}>
+          <p>Precio actual: ${Number(buyTarget.current_price).toFixed(2)}</p>
+          <label>Cantidad:</label>
+          <input
+            type="number"
+            min="1"
+            max="20"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+          />
+          <p className="panel-page__estimate">
+            Total estimado: ${(quantity * Number(buyTarget.current_price)).toFixed(2)}
+          </p>
+          {buyError && <p className="panel-page__modal-error">{buyError}</p>}
+          <div className="panel-page__modal-buttons">
+            <button onClick={confirmBuy} disabled={buyLoading} className="btn">
+              {buyLoading ? 'Comprando...' : 'Confirmar compra'}
+            </button>
+            <button onClick={() => setBuyTarget(null)} className="btn btn-secondary">
+              Cancelar
+            </button>
           </div>
-        </div>
+        </Modal>
       )}
 
       {historyTarget && (
-        <div className="panel-page__modal">
-          <div className="panel-page__modal-content">
-            <h3 className="panel-page__modal-title">
-              Historial de {historyTarget.name}
-            </h3>
-            {historyLoading ? <p>Cargando...</p> : renderChart(historyData)}
-            <button onClick={() => setHistoryTarget(null)} className="btn btn-secondary">
-              Cerrar
-            </button>
-          </div>
-        </div>
+        <Modal title={`Historial de ${historyTarget.name}`} onClose={() => setHistoryTarget(null)}>
+          {historyLoading ? <p>Cargando...</p> : renderChart(historyData)}
+          <button onClick={() => setHistoryTarget(null)} className="btn btn-secondary">
+            Cerrar
+          </button>
+        </Modal>
       )}
     </div>
   );
