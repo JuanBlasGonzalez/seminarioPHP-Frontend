@@ -6,6 +6,7 @@ import {getAssetsService,getAssetHistoryService} from '../../services/asset.serv
 import {buyAssetService} from '../../services/portfolio.services';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
 import Modal from '../../components/Modal/Modal';
+import AssetTable from '../../components/AssetTable/AssetTable';
 import './PanelPage.css';
 
 function PanelPage() {
@@ -160,41 +161,12 @@ function PanelPage() {
         Comprá activos y consultá su historial reciente de precios.
       </p>
 
-      <table className="panel-page__table">
-        <thead>
-          <tr>
-            <th>Activo</th>
-            <th>Precio</th>
-            <th>Evolución</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {assets.map((asset) => (
-            <tr key={asset.id}>
-              <td>{asset.name}</td>
-              <td className="panel-page__price">
-                ${Number(asset.current_price).toFixed(2)}
-              </td>
-              <td className={`panel-page__evolution--${asset.evolution}`}>
-                {asset.evolution === 'up' && '▲'}
-                {asset.evolution === 'down' && '▼'}
-                {asset.evolution === 'neutral' && '—'}
-              </td>
-              <td>
-                <div className="panel-page__actions">
-                  <button onClick={() => openBuy(asset)} className="btn">
-                    Comprar
-                  </button>
-                  <button onClick={() => openHistory(asset)} className="btn btn-secondary">
-                    Historial
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <AssetTable
+        assets={assets}
+        showActions={true}
+        onBuyClick={openBuy}
+        onHistoryClick={openHistory}
+      />
 
       {successMessage && (
         <p className="panel-page__success">{successMessage}</p>

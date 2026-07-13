@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {getAssetsService} from '../../services/asset.services';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
+import AssetTable from '../../components/AssetTable/AssetTable';
 import './StatPage.css';
 
 function StatPage() {
@@ -8,8 +9,6 @@ function StatPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortDir, setSortDir] = useState('asc');
   const previousPrices = useRef({});
 
   const fetchAssets = async (searchTerm = '') => {
@@ -51,23 +50,6 @@ function StatPage() {
     return () => clearInterval(interval);
   }, [search]);
 
-  const sorted = [...assets].sort((a, b) => {
-    const valA = sortBy === 'price' ? Number(a.current_price) : a.name.toLowerCase();
-    const valB = sortBy === 'price' ? Number(b.current_price) : b.name.toLowerCase();
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  const toggleSort = (field) => {
-    if (sortBy === field) {
-      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortBy(field);
-      setSortDir('asc');
-    }
-  };
-
   if (loading) return <p>Cargando activos...</p>;
   if (error) return <p className="error">{error}</p>;
 
@@ -86,34 +68,10 @@ function StatPage() {
         className="stat-page__search"
       />
 
-      <table className="stat-page__table">
-        <thead>
-          <tr>
-            <th onClick={() => toggleSort('name')} className="stat-page__sortable">
-              Nombre {sortBy === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
-            </th>
-            <th onClick={() => toggleSort('price')} className="stat-page__sortable">
-              Precio {sortBy === 'price' && (sortDir === 'asc' ? '↑' : '↓')}
-            </th>
-            <th>Evolución</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((asset) => (
-            <tr key={asset.id}>
-              <td>{asset.name}</td>
-              <td className="stat-page__price">
-                ${Number(asset.current_price).toFixed(2)}
-              </td>
-              <td className={`stat-page__evolution--${asset.evolution}`}>
-                {asset.evolution === 'up' && '▲'}
-                {asset.evolution === 'down' && '▼'}
-                {asset.evolution === 'neutral' && '—'}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <AssetTable
+        assets={assets}
+        showActions={false}
+      />
     </div>
   );
 }

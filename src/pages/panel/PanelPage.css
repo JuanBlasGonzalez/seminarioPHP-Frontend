@@ -10,45 +10,8 @@
   font-size: 0.9rem;
 }
 
-.panel-page__table {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 2rem;
-}
-
-.panel-page__sortable {
-  cursor: pointer;
-  user-select: none;
-  color: var(--color-text-muted);
-}
-
 .panel-page__sortable:hover {
   color: var(--color-text);
-}
-
-.panel-page__price {
-  font-family: var(--font-mono);
-}
-
-.panel-page__evolution--up {
-  color: var(--color-gain);
-  font-weight: 700;
-}
-
-.panel-page__evolution--down {
-  color: var(--color-loss);
-  font-weight: 700;
-}
-
-.panel-page__evolution--neutral {
-  color: var(--color-text-muted);
-}
-
-.panel-page__actions {
-  display: flex;
-  gap: 0.5rem;
 }
 
 .panel-page__estimate {
