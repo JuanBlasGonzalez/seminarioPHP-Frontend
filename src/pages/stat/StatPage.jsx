@@ -8,14 +8,19 @@ function StatPage() {
   const [assets, setAssets] = useState([]);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [isPending, startTransition] = useTransition();
   const previousPrices = useRef({});
+  
 
-  const fetchAssets = (searchTerm = '') => {
+  const fetchAssets = (searchTerm = '', min = '', max = '') => {
     startTransition(async () => {
       try {
         const params = {};
         if (searchTerm) params.type = searchTerm;
+        if (min) params.min_price = min;
+        if (max) params.max_price = max;
 
         const response = await getAssetsService(params);
         const data = response.data;
@@ -49,10 +54,10 @@ function StatPage() {
   };
 
   useEffect(() => {
-    fetchAssets('');
-    const interval = setInterval(() => fetchAssets(''), REFRESH_INTERVAL_MS);
+    fetchAssets('', '', '');
+    const interval = setInterval(() => fetchAssets('', '', ''), REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, []); 
 
   if (isPending && assets.length === 0) return <p>Cargando activos...</p>;
   if (error) return <p className="error">{error}</p>;
@@ -68,7 +73,7 @@ function StatPage() {
         className="stat-page__search-container"
         onSubmit={(e) => {
           e.preventDefault();
-          fetchAssets(search);
+          fetchAssets(search, minPrice, maxPrice);
         }}
       >
         <input
@@ -76,6 +81,20 @@ function StatPage() {
           placeholder="Buscar por nombre exacto..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="stat-page__search"
+        />
+        <input
+          type="number"
+          placeholder="Precio mínimo"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+          className="stat-page__search"
+        />
+        <input
+          type="number"
+          placeholder="Precio máximo"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
           className="stat-page__search"
         />
         <button type="submit" className="btn">
