@@ -49,3 +49,19 @@
 .stat-page__evolution--neutral {
   color: var(--color-text-muted);
 }
+
+.stat-page__no-results {
+  color: var(--color-text-muted);
+  margin-top: 1rem;
+}
+
+.stat-page__search-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.stat-page__search {
+  max-width: 300px;
+}

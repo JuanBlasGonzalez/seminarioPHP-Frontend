@@ -1,56 +1,60 @@
-import { useState, useEffect, useRef } from 'react';
-import {getAssetsService} from '../../services/asset.services';
+import { useState, useEffect, useRef, useTransition } from 'react';
+import { getAssetsService } from '../../services/asset.services';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
 import AssetTable from '../../components/AssetTable/AssetTable';
 import './StatPage.css';
 
 function StatPage() {
   const [assets, setAssets] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [isPending, startTransition] = useTransition();
   const previousPrices = useRef({});
 
-  const fetchAssets = async (searchTerm = '') => {
-    try {
-      const params = {};
-      if (searchTerm) params.type = searchTerm;
+  const fetchAssets = (searchTerm = '') => {
+    startTransition(async () => {
+      try {
+        const params = {};
+        if (searchTerm) params.type = searchTerm;
 
-      const response = await getAssetsService(params);
-      const data = response.data;
+        const response = await getAssetsService(params);
+        const data = response.data;
 
-      const withEvolution = data.map((asset) => {
-        const prevPrice = previousPrices.current[asset.id];
-        let evolution = 'neutral';
-        if (prevPrice !== undefined) {
-          if (Number(asset.current_price) > Number(prevPrice)) evolution = 'up';
-          else if (Number(asset.current_price) < Number(prevPrice)) evolution = 'down';
-        }
-        return { ...asset, evolution };
-      });
+        const withEvolution = data.map((asset) => {
+          const prevPrice = previousPrices.current[asset.id];
+          let evolution = 'neutral';
+          if (prevPrice !== undefined) {
+            if (Number(asset.current_price) > Number(prevPrice)) evolution = 'up';
+            else if (Number(asset.current_price) < Number(prevPrice)) evolution = 'down';
+          }
+          return { ...asset, evolution };
+        });
 
-      const newPrevious = {};
-      data.forEach((asset) => {
-        newPrevious[asset.id] = asset.current_price;
-      });
-      previousPrices.current = newPrevious;
+        const newPrevious = {};
+        data.forEach((asset) => {
+          newPrevious[asset.id] = asset.current_price;
+        });
+        previousPrices.current = newPrevious;
 
-      setAssets(withEvolution);
-      setError('');
-    } catch (err) {
-      setError('No se pudieron cargar los activos.');
-    } finally {
-      setLoading(false);
-    }
+        setAssets(withEvolution); 
+        setError('');
+      } catch (err) {
+          if(err.response?.status === 400) {
+            setAssets([]);
+          } else {
+             setError('No se pudieron cargar los activos.');
+          }
+      }
+    });
   };
 
   useEffect(() => {
-    fetchAssets(search);
-    const interval = setInterval(() => fetchAssets(search), REFRESH_INTERVAL_MS);
+    fetchAssets('');
+    const interval = setInterval(() => fetchAssets(''), REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [search]);
+  }, []);
 
-  if (loading) return <p>Cargando activos...</p>;
+  if (isPending && assets.length === 0) return <p>Cargando activos...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
@@ -60,18 +64,30 @@ function StatPage() {
         Precios actualizados automáticamente cada 3 minutos.
       </p>
 
-      <input
-        type="text"
-        placeholder="Buscar por nombre..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="stat-page__search"
-      />
+      <form
+        className="stat-page__search-container"
+        onSubmit={(e) => {
+          e.preventDefault();
+          fetchAssets(search);
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Buscar por nombre exacto..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="stat-page__search"
+        />
+        <button type="submit" className="btn">
+          Buscar
+        </button>
+      </form>
 
-      <AssetTable
-        assets={assets}
-        showActions={false}
-      />
+      {assets.length === 0 && !isPending && (
+      <p className="stat-page__no-results">No se encontraron activos.</p>
+      )}
+
+      <AssetTable assets={assets} showActions={false} />
     </div>
   );
 }

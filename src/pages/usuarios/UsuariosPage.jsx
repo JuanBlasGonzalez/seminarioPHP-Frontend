@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Link } from 'react-router-dom';
-import {getAllUsersService} from '../../services/user.services';
+import { getAllUsersService } from '../../services/user.services';
 import { updateAssetsPricesService } from '../../services/asset.services';
 import './UsuariosPage.css';
 
@@ -10,15 +10,19 @@ function UsuariosPage() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updatingPrices, setUpdatingPrices] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    getAllUsersService()
-      .then((res) => setUsers(res.data))
-      .catch(() => setError('No se pudo cargar el listado.'))
-      .finally(() => setLoading(false));
+    startTransition(async () => {
+      try {
+        const res = await getAllUsersService();
+        setUsers(res.data);
+      } catch {
+        setError('No se pudo cargar el listado.');
+      }
+    });
   }, []);
 
   const handleUpdatePrices = async () => {
@@ -40,7 +44,7 @@ function UsuariosPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  if (loading) return <p>Cargando usuarios...</p>;
+  if (isPending) return <p>Cargando usuarios...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
@@ -58,11 +62,7 @@ function UsuariosPage() {
           }}
           className="usuarios-page__search"
         />
-        <button
-          onClick={handleUpdatePrices}
-          disabled={updatingPrices}
-          className="btn"
-        >
+        <button onClick={handleUpdatePrices} disabled={updatingPrices} className="btn">
           {updatingPrices ? 'Actualizando...' : 'Actualizar precios del mercado'}
         </button>
       </div>
@@ -101,19 +101,11 @@ function UsuariosPage() {
       </table>
 
       <div className="usuarios-page__pagination">
-        <button
-          onClick={() => setPage((p) => p - 1)}
-          disabled={page === 1}
-          className="btn btn-secondary"
-        >
+        <button onClick={() => setPage((p) => p - 1)} disabled={page === 1} className="btn btn-secondary">
           ‹ Anterior
         </button>
         <span>Página {page} de {totalPages}</span>
-        <button
-          onClick={() => setPage((p) => p + 1)}
-          disabled={page === totalPages}
-          className="btn btn-secondary"
-        >
+        <button onClick={() => setPage((p) => p + 1)} disabled={page === totalPages} className="btn btn-secondary">
           Siguiente ›
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getPortfolioService, buyAssetService, sellAssetService, deletePortfolioAssetService } from '../../services/portfolio.services';
@@ -9,7 +9,6 @@ import './PortfolioPage.css';
 function PortfolioPage() {
   const { user, updateUser } = useAuth();
   const [holdings, setHoldings] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeAction, setActiveAction] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -17,17 +16,18 @@ function PortfolioPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [isPending, startTransition] = useTransition();
 
-  const fetchPortfolio = useCallback(async () => {
-    try {
-      const response = await getPortfolioService();
-      setHoldings(response.data);
-      setError('');
-    } catch (err) {
-      setError('No se pudo cargar el portfolio.');
-    } finally {
-      setLoading(false);
-    }
+  const fetchPortfolio = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const response = await getPortfolioService();
+        setHoldings(response.data);
+        setError('');
+      } catch (err) {
+        setError('No se pudo cargar el portfolio.');
+      }
+    });
   }, []);
 
   const fetchBalance = useCallback(async () => {
@@ -66,7 +66,9 @@ function PortfolioPage() {
 
     setActionLoading(true);
     try {
-      activeAction.type === 'buy' ? await buyAssetService(holding.asset_id, quantity) : await sellAssetService(holding.asset_id, quantity);
+      activeAction.type === 'buy'
+        ? await buyAssetService(holding.asset_id, quantity)
+        : await sellAssetService(holding.asset_id, quantity);
       await fetchPortfolio();
       await fetchBalance();
       setSuccessMessage(
@@ -93,7 +95,7 @@ function PortfolioPage() {
     }
   };
 
-  if (loading) return <p>Cargando portfolio...</p>;
+  if (isPending && holdings.length === 0) return <p>Cargando portfolio...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
@@ -103,12 +105,12 @@ function PortfolioPage() {
         Saldo disponible: <span>${Number(user.balance ?? 0).toFixed(2)}</span>
       </p>
 
-      {holdings.length === 0 && <p>Todavía no tenés activos en tu portfolio.</p>}
-
       {successMessage && (
         <p className="portfolio-page__success">{successMessage}</p>
       )}
-      
+
+      {holdings.length === 0 && <p>Todavía no tenés activos en tu portfolio.</p>}
+
       <div className="portfolio-page__grid">
         {holdings.map((holding) => {
           const currentValue = Number(holding.quantity) * Number(holding.current_price);
@@ -136,7 +138,7 @@ function PortfolioPage() {
                   disabled={Number(holding.quantity) !== 0}
                   className="btn btn-danger"
                 >
-                  Eliminar  
+                  Eliminar
                 </button>
               </div>
 

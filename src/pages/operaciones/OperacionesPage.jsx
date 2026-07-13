@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import {getTransactionsService} from '../../services/transaction.services';
-import {getAssetsService} from '../../services/asset.services';
+import { useState, useEffect, useCallback, useTransition } from 'react';
+import { getTransactionsService } from '../../services/transaction.services';
+import { getAssetsService } from '../../services/asset.services';
 import './OperacionesPage.css';
 
 function OperacionesPage() {
   const [transactions, setTransactions] = useState([]);
   const [assets, setAssets] = useState([]);
   const [filters, setFilters] = useState({ type: '', asset_id: '' });
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     getAssetsService()
@@ -16,21 +16,20 @@ function OperacionesPage() {
       .catch(() => {});
   }, []);
 
-  const fetchTransactions = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {};
-      if (filters.type) params.type = filters.type;
-      if (filters.asset_id) params.asset_id = filters.asset_id;
+  const fetchTransactions = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const params = {};
+        if (filters.type) params.type = filters.type;
+        if (filters.asset_id) params.asset_id = filters.asset_id;
 
-      const response = await getTransactionsService({ params });
-      setTransactions(response.data);
-      setError('');
-    } catch (err) {
-      setError('No se pudo cargar el historial.');
-    } finally {
-      setLoading(false);
-    }
+        const response = await getTransactionsService(params);
+        setTransactions(response.data);
+        setError('');
+      } catch (err) {
+        setError('No se pudo cargar el historial.');
+      }
+    });
   }, [filters]);
 
   useEffect(() => {
@@ -62,10 +61,10 @@ function OperacionesPage() {
         </select>
       </div>
 
-      {loading && <p>Cargando...</p>}
+      {isPending && <p>Cargando...</p>}
       {error && <p className="error">{error}</p>}
 
-      {!loading && !error && (
+      {!isPending && !error && (
         <table className="operaciones-page__table">
           <thead>
             <tr>
@@ -88,8 +87,8 @@ function OperacionesPage() {
                 </td>
                 <td>{tx.asset_name}</td>
                 <td>{tx.quantity}</td>
-                <td className="operaciones-page__price">${Number(tx.price_per_unit).toFixed(2)}</td>
-                <td className="operaciones-page__price">${Number(tx.total_amount).toFixed(2)}</td>
+                <td>${Number(tx.price_per_unit).toFixed(2)}</td>
+                <td>${Number(tx.total_amount).toFixed(2)}</td>
               </tr>
             ))}
             {transactions.length === 0 && (

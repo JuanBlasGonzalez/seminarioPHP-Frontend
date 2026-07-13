@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useTransition } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import {getUserService} from '../../services/user.services';
-import {getAssetsService,getAssetHistoryService} from '../../services/asset.services';
-import {buyAssetService} from '../../services/portfolio.services';
-import { REFRESH_INTERVAL_MS } from '../../utils/constants';
-import Modal from '../../components/Modal/Modal';
+import { getAssetsService, getAssetHistoryService } from '../../services/asset.services';
+import { buyAssetService } from '../../services/portfolio.services';
+import { getUserService } from '../../services/user.services';
 import AssetTable from '../../components/AssetTable/AssetTable';
+import Modal from '../../components/Modal/Modal';
+import { REFRESH_INTERVAL_MS } from '../../utils/constants';
 import './PanelPage.css';
 
 function PanelPage() {
@@ -14,57 +14,58 @@ function PanelPage() {
   const navigate = useNavigate();
 
   const [assets, setAssets] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isPending, startTransition] = useTransition();
   const previousPrices = useRef({});
 
   const [buyTarget, setBuyTarget] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [buyError, setBuyError] = useState('');
   const [buyLoading, setBuyLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [historyTarget, setHistoryTarget] = useState(null);
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+
+  const fetchAssets = () => {
+    startTransition(async () => {
+      try {
+        const response = await getAssetsService();
+        const data = response.data;
+
+        const withEvolution = data.map((asset) => {
+          const prevPrice = previousPrices.current[asset.id];
+          let evolution = 'neutral';
+          if (prevPrice !== undefined) {
+            if (Number(asset.current_price) > Number(prevPrice)) evolution = 'up';
+            else if (Number(asset.current_price) < Number(prevPrice)) evolution = 'down';
+          }
+          return { ...asset, evolution };
+        });
+
+        const newPrevious = {};
+        data.forEach((asset) => {
+          newPrevious[asset.id] = asset.current_price;
+        });
+        previousPrices.current = newPrevious;
+
+        setAssets(withEvolution);
+        setError('');
+      } catch (err) {
+        setError('No se pudieron cargar los activos.');
+      }
+    });
+  };
+
   const fetchBalance = useCallback(async () => {
     try {
       const response = await getUserService(user.id);
       updateUser({ balance: response.data.balance });
     } catch (err) {
       console.error(err);
-    } 
-  }, [user?.id]);
-  
-  const fetchAssets = async () => {
-    try {
-      const response = await getAssetsService();
-      const data = response.data;
-
-      const withEvolution = data.map((asset) => {
-        const prevPrice = previousPrices.current[asset.id];
-        let evolution = 'neutral';
-        if (prevPrice !== undefined) {
-          if (Number(asset.current_price) > Number(prevPrice)) evolution = 'up';
-          else if (Number(asset.current_price) < Number(prevPrice)) evolution = 'down';
-        }
-        return { ...asset, evolution };
-      });
-
-      const newPrevious = {};
-      data.forEach((asset) => {
-        newPrevious[asset.id] = asset.current_price;
-      });
-      previousPrices.current = newPrevious;
-
-      setAssets(withEvolution);
-      setError('');
-    } catch (err) {
-      setError('No se pudieron cargar los activos.');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user?.id]);
 
   useEffect(() => {
     fetchAssets();
@@ -151,7 +152,7 @@ function PanelPage() {
     );
   };
 
-  if (loading) return <p>Cargando activos...</p>;
+  if (isPending && assets.length === 0) return <p>Cargando activos...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
