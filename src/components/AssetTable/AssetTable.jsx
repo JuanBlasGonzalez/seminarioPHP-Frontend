@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import PriceTag from '../PriceTag/PriceTag';
+import EvolutionBadge from '../EvolutionBadge/EvolutionBadge';
 import './AssetTable.css';
 
 function AssetTable({ assets, showActions, onBuyClick, onHistoryClick }) {
@@ -40,13 +42,11 @@ function AssetTable({ assets, showActions, onBuyClick, onHistoryClick }) {
         {sorted.map((asset) => (
           <tr key={asset.id}>
             <td>{asset.name}</td>
-            <td className="asset-table__price">
-              ${Number(asset.current_price).toFixed(2)}
+            <td>
+              <PriceTag value={asset.current_price} />
             </td>
-            <td className={`asset-table__evolution--${asset.evolution}`}>
-              {asset.evolution === 'up' && '▲'}
-              {asset.evolution === 'down' && '▼'}
-              {asset.evolution === 'neutral' && '—'}
+            <td>
+              <EvolutionBadge evolution={asset.evolution} />
             </td>
             {showActions && (
               <td>

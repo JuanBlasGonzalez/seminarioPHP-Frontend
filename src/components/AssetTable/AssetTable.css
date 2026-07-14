@@ -7,24 +7,6 @@
   overflow: hidden;
 }
 
-.asset-table__price {
-  font-family: var(--font-mono);
-}
-
-.asset-table__evolution--up {
-  color: var(--color-gain);
-  font-weight: 700;
-}
-
-.asset-table__evolution--down {
-  color: var(--color-loss);
-  font-weight: 700;
-}
-
-.asset-table__evolution--neutral {
-  color: var(--color-text-muted);
-}
-
 .asset-table__actions {
   display: flex;
   gap: 0.5rem;

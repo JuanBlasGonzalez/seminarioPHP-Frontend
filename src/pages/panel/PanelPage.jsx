@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useTransition } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { getAssetsService, getAssetHistoryService } from '../../services/asset.services';
@@ -6,17 +6,16 @@ import { buyAssetService } from '../../services/portfolio.services';
 import { getUserService } from '../../services/user.services';
 import AssetTable from '../../components/AssetTable/AssetTable';
 import Modal from '../../components/Modal/Modal';
+import PriceTag from '../../components/PriceTag/PriceTag';
 import { REFRESH_INTERVAL_MS } from '../../utils/constants';
+import { useAssetEvolution } from '../../hooks/useAssetEvolution';
 import './PanelPage.css';
 
 function PanelPage() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
 
-  const [assets, setAssets] = useState([]);
-  const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
-  const previousPrices = useRef({});
 
   const [buyTarget, setBuyTarget] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -28,35 +27,7 @@ function PanelPage() {
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
-  const fetchAssets = () => {
-    startTransition(async () => {
-      try {
-        const response = await getAssetsService();
-        const data = response.data;
-
-        const withEvolution = data.map((asset) => {
-          const prevPrice = previousPrices.current[asset.id];
-          let evolution = 'neutral';
-          if (prevPrice !== undefined) {
-            if (Number(asset.current_price) > Number(prevPrice)) evolution = 'up';
-            else if (Number(asset.current_price) < Number(prevPrice)) evolution = 'down';
-          }
-          return { ...asset, evolution };
-        });
-
-        const newPrevious = {};
-        data.forEach((asset) => {
-          newPrevious[asset.id] = asset.current_price;
-        });
-        previousPrices.current = newPrevious;
-
-        setAssets(withEvolution);
-        setError('');
-      } catch (err) {
-        setError('No se pudieron cargar los activos.');
-      }
-    });
-  };
+  const { assets, error, fetchAssets } = useAssetEvolution();
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -66,12 +37,6 @@ function PanelPage() {
       console.error(err);
     }
   }, [user?.id]);
-
-  useEffect(() => {
-    fetchAssets();
-    const interval = setInterval(fetchAssets, REFRESH_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, []);
 
   const openBuy = (asset) => {
     if (!user) {
@@ -93,7 +58,7 @@ function PanelPage() {
       await buyAssetService(buyTarget.id, quantity);
       setSuccessMessage(`Compraste ${quantity} unidades de ${buyTarget.name} correctamente.`);
       setBuyTarget(null);
-      fetchAssets();
+      fetchAssets(false);
       await fetchBalance();
     } catch (err) {
       setBuyError(err.response?.data?.error || 'No se pudo completar la compra.');
@@ -175,7 +140,7 @@ function PanelPage() {
 
       {buyTarget && (
         <Modal title={`Comprar ${buyTarget.name}`} onClose={() => setBuyTarget(null)}>
-          <p>Precio actual: ${Number(buyTarget.current_price).toFixed(2)}</p>
+          <p>Precio actual: <PriceTag value={buyTarget.current_price} /></p>
           <label>Cantidad:</label>
           <input
             type="number"
@@ -185,7 +150,7 @@ function PanelPage() {
             onChange={(e) => setQuantity(Number(e.target.value))}
           />
           <p className="panel-page__estimate">
-            Total estimado: ${(quantity * Number(buyTarget.current_price)).toFixed(2)}
+            Total estimado: <PriceTag value={quantity * Number(buyTarget.current_price)} />
           </p>
           {buyError && <p className="panel-page__modal-error">{buyError}</p>}
           <div className="panel-page__modal-buttons">

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getPortfolioService, buyAssetService, sellAssetService, deletePortfolioAssetService } from '../../services/portfolio.services';
 import { getUserService } from '../../services/user.services';
 import Modal from '../../components/Modal/Modal';
+import PriceTag from '../../components/PriceTag/PriceTag';
 import './PortfolioPage.css';
 
 function PortfolioPage() {
@@ -102,7 +103,7 @@ function PortfolioPage() {
     <div className="portfolio-page">
       <h2>Mi portfolio</h2>
       <p className="portfolio-page__balance">
-        Saldo disponible: <span>${Number(user.balance ?? 0).toFixed(2)}</span>
+        Saldo disponible: <span><PriceTag value={user.balance ?? 0} /></span>
       </p>
 
       {successMessage && (
@@ -120,7 +121,7 @@ function PortfolioPage() {
             <div key={holding.asset_id} className="portfolio-card">
               <h3>{holding.name}</h3>
               <p className="portfolio-card__quantity">{holding.quantity} unidades</p>
-              <p className="portfolio-card__value">${currentValue.toFixed(2)}</p>
+              <p className="portfolio-card__value"><PriceTag value={currentValue} /></p>
 
               <div className="portfolio-card__actions">
                 <button onClick={() => openAction(holding.asset_id, 'buy')} className="btn">
@@ -155,8 +156,8 @@ function PortfolioPage() {
                     />
                   </label>
                   <p className="portfolio-card__estimate">
-                    {activeAction.type === 'buy' ? 'Costo estimado' : 'Recibirás aprox.'}: $
-                    {(quantity * Number(holding.current_price)).toFixed(2)}
+                    {activeAction.type === 'buy' ? 'Costo estimado' : 'Recibirás aprox.'}:  
+                    <PriceTag value={quantity * Number(holding.current_price)} />
                   </p>
                   {actionError && <p className="portfolio-card__action-error">{actionError}</p>}
                   <div className="portfolio-card__action-buttons">

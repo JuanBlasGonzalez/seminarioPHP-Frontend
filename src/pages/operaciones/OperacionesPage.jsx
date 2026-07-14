@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useTransition } from 'react';
 import { getTransactionsService } from '../../services/transaction.services';
 import { getAssetsService } from '../../services/asset.services';
+import PriceTag from '../../components/PriceTag/PriceTag';
 import './OperacionesPage.css';
 
 function OperacionesPage() {
@@ -87,8 +88,8 @@ function OperacionesPage() {
                 </td>
                 <td>{tx.asset_name}</td>
                 <td>{tx.quantity}</td>
-                <td>${Number(tx.price_per_unit).toFixed(2)}</td>
-                <td>${Number(tx.total_amount).toFixed(2)}</td>
+                <td><PriceTag value={tx.price_per_unit} /></td>
+                <td><PriceTag value={tx.total_amount} /></td>
               </tr>
             ))}
             {transactions.length === 0 && (

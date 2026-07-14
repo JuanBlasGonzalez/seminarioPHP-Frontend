@@ -1,0 +1,15 @@
+.evolution-badge {
+  font-weight: 700;
+}
+
+.evolution-badge--up {
+  color: var(--color-gain);
+}
+
+.evolution-badge--down {
+  color: var(--color-loss);
+}
+
+.evolution-badge--neutral {
+  color: var(--color-text-muted);
+}
